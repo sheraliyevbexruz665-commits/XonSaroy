@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XON SAROY — Premium Turar Joy Majmualari</title>
+  
+  <!-- Google Fonts & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Three.js (3D Vizualizatsiya uchun) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --dark-bg: #0b0d17;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(212, 175, 55, 0.3);
+      --text: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* 3D Canvas Fon */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Asosiy Content */
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header & Navigation */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 25px 8%;
+      background: rgba(11, 13, 23, 0.7);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+
+    .logo span {
+      color: #fff;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 30px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: var(--gold);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8%;
+    }
+
+    .hero-text {
+      max-width: 600px;
+    }
+
+    .hero-text h1 {
+      font-size: 54px;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, var(--gold-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-text p {
+      font-size: 18px;
+      color: #a0a5b5;
+      margin-bottom: 35px;
+      line-height: 1.6;
+    }
+
+    /* 3D Tugmalar (Glassmorphism + Interactive Depth) */
+    .btn-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-3d {
+      position: relative;
+      padding: 16px 36px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      color: #fff;
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    /* Xarid qilish tugmasi */
+    .btn-buy {
+      background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
+      box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-buy:hover {
+      transform: translateY(-5px) rotateX(10deg);
+      box-shadow: 0 18px 35px rgba(212, 175, 55, 0.6),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Jadval / Katalog tugmasi */
+    .btn-sheet {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-sheet:hover {
+      transform: translateY(-5px) rotateX(10deg);
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--gold);
+      box-shadow: 0 18px 35px rgba(212, 175, 55, 0.2);
+    }
+
+    /* 3D Karta (Interactive Feature Card) */
+    .card-3d-wrapper {
+      perspective: 1000px;
+    }
+
+    .card-3d {
+      width: 380px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+      transition: transform 0.5s ease;
+      transform-style: preserve-3d;
+    }
+
+    .card-3d:hover {
+      transform: rotateY(-12deg) rotateX(8deg) translateY(-10px);
+    }
+
+    .card-3d h3 {
+      font-size: 24px;
+      color: var(--gold);
+      margin-bottom: 15px;
+    }
+
+    .card-3d p {
+      color: #b0b5c5;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid var(--glass-border);
+      color: #707585;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D Orqa Fon Canvas -->
+  <div id="canvas-container"></div>
+
+  <div class="content-wrapper">
+    <!-- Header -->
+    <header>
+      <div class="logo">XON <span>SAROY</span></div>
+      <nav>
+        <a href="#about">Biz haqimizda</a>
+        <a href="#projects">Loyiha kodi</a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfjcTERfqdLxyDyiw6kypmoNeb6xQ2AIBAnSo90NKcX8rnC7A/viewform?usp=publish-editor" target="_blank">Xarid</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Kelajak Uyini Bugun Tanlang</h1>
+        <p>Xon Saroy — shahar markazidagi zamonaviy me'morchilik va yuqori darajadagi qulaylik mujassam bo'lgan premium turar joy majmualari.</p>
+        
+        <div class="btn-group">
+          <!-- Xarid qilish tugmasi -->
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSfjcTERfqdLxyDyiw6kypmoNeb6xQ2AIBAnSo90NKcX8rnC7A/viewform?usp=publish-editor" target="_blank" class="btn-3d btn-buy">
+            <i class="fa-solid fa-cart-shopping"></i> Xarid Qilish
+          </a>
+
+          <!-- Google Sheets hujjatiga tugma -->
+          <a href="https://docs.google.com/spreadsheets/d/1VZJUkUEjWJUOfhenGB6TZfNgmVTwljEgwfj3vzR95t4/edit?usp=sharing" target="_blank" class="btn-3d btn-sheet">
+            <i class="fa-solid fa-table"></i> Jadvalni Ko'rish
+          </a>
+        </div>
+      </div>
+
+      <!-- 3D Interaktiv Karta -->
+      <div class="card-3d-wrapper">
+        <div class="card-3d">
+          <i class="fa-solid fa-building-user" style="font-size: 40px; color: var(--gold); margin-bottom: 20px;"></i>
+          <h3>Premium Xonadonlar</h3>
+          <p>Innovatsion 3D dizayn, ekologik hudud va rivojlangan infratuzilma bilan hayot sifatini yangi bosqichga olib chiqing.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      &copy; 2026 XON SAROY. Barcha huquqlar qonun bilan himoyalangan.
+    </footer>
+  </div>
+
+  <!-- 3D Orqa Fon Javascript (Three.js) -->
+  <script>
+    const container = document.getElementById('canvas-container');
+
+    // Scene & Camera setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 30;
+
+    // Renderer setup
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    // Light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xd4af37, 2);
+    pointLight.position.set(20, 20, 20);
+    scene.add(pointLight);
+
+    // 3D Ob'yektlar (Zarrachalar/Geometriya)
+    const geometry = new THREE.IcosahedronGeometry(12, 1);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xd4af37,
+      wireframe: true,
+      roughness: 0.3,
+      metalness: 0.8
+    });
+    
+    const sphere = new THREE.Mesh(geometry, material);
+    sphere.position.set(25, 0, -10);
+    scene.add(sphere);
+
+    // Mayda suzuvchi 3D zarrachalar
+    const particlesGeometry = new THREE.BufferGeometry();
+    const count = 300;
+    const positions = new Float32Array(count * 3);
+
+    for (let i = 0; i < count * 3; i++) {
+      positions[i] = (Math.random() - 0.5) * 100;
+    }
+
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.5,
+      color: 0xd4af37,
+      transparent: true,
+      opacity: 0.5
+    });
+
+    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particles);
+
+    // Animatsiya funksiyasi
+    function animate() {
+      requestAnimationFrame(animate);
+
+      sphere.rotation.x += 0.003;
+      sphere.rotation.y += 0.005;
+
+      particles.rotation.y -= 0.001;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Window Resize handling
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
